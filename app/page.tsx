@@ -26,7 +26,6 @@ export default async function Home() {
 
   return (
     <main>
-      <Navbar />
       <HeroLanding />
       <BlogList entries={entries} />
     </main>

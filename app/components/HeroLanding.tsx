@@ -1,17 +1,36 @@
+"use client";
+
+import { Typewriter } from "react-simple-typewriter";
+
 export default function HeroLanding() {
   return (
-    <section className="bg-gray-900 text-white py-20">
-      <div className="container mx-auto px-6 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4">Welcome to My Blog</h1>
-        <p className="text-lg md:text-2xl mb-8">
-          Sharing insights, stories, and ideas on web development and technology.
+    <section className="bg-gray-50 text-center py-20 transition-colors duration-300">
+      <div className="container mx-auto px-6">
+        {/* Intro */}
+        <h2 className="text-3xl md:text-5xl font-semibold text-gray-900">
+          Hi I&apos;m 👋 <span className="font-bold">Vaishnavan</span>
+        </h2>
+
+        {/* Typewriter Text */}
+        <h3 className="text-2xl md:text-4xl font-semibold text-red-500 mb-6 h-12">
+          <Typewriter
+            words={["Node.js", "Express.js", "JavaScript", "React Developer"]}
+            loop={true}
+            cursor
+            cursorStyle="|"
+            typeSpeed={100}
+            deleteSpeed={70}
+            delaySpeed={1500}
+          />
+        </h3>
+
+        {/* Description */}
+        <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+          👋Welcome to my dynamic corner of the web! Through this blog, you’ll experience 
+          the exciting blend of tech, lifestyle, and positivity. 📱🌟 We’ll explore 
+          cutting-edge tech, enhance your lifestyle, and sprinkle some daily positivity 
+          into your life. Join me for an adventure you won’t want to miss! 🚀✨
         </p>
-        <a
-          href="#blogs"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300"
-        >
-          Explore Blogs
-        </a>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { GRAPHQL_ENDPOINT, ACCESS_TOKEN } from "../../constants/constants";
-import renderRichText from "../../renderRichText";
+import BlogContent from "../../components/BlogContent"; // Client Component
 
 async function getBlogBySlug(slug: string) {
   const query = `
@@ -12,9 +12,7 @@ async function getBlogBySlug(slug: string) {
           slug
           publishedDate
           featuredImage { url title }
-          content {
-            json
-          }
+          content { json links { assets { block { sys { id } url title description } } } }
         }
       }
     }
@@ -29,38 +27,16 @@ async function getBlogBySlug(slug: string) {
     body: JSON.stringify({ query, variables: { slug } }),
     next: { revalidate: 60 },
   });
-    
-    console.log("Fetching blog with slug:", slug, res);
 
-    const { data } = await res.json();
-    console.log("Fetched blog data:", data);
+  const { data } = await res.json();
   return data.blogCollection.items[0];
 }
 
-export default async function BlogDetail({ params }: { params: { slug: string } }) {
-    const { slug } = await params;
-    console.log("BlogDetail params:", slug);
+export default async function BlogDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params; // ✅ unwrap Promise properly
   const blog = await getBlogBySlug(slug);
 
   if (!blog) return <div className="text-center py-20">Blog not found</div>;
 
-  return (
-    <article className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
-      <p className="text-gray-600 mb-6">
-        {new Date(blog.publishedDate).toLocaleDateString()}
-      </p>
-      {blog.featuredImage && (
-        <img
-          src={blog.featuredImage.url}
-          alt={blog.featuredImage.title}
-          className="rounded-lg mb-8 w-full h-auto"
-        />
-      )}
-      <div className="prose max-w-none">
-              {/* Here you can render rich text with documentToReactComponents */}
-         {renderRichText(blog.content)} 
-      </div>
-    </article>
-  );
+  return <BlogContent blog={blog} />;
 }
