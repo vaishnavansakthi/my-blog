@@ -267,14 +267,11 @@ export default function BlogContent({ blog }: { blog: any }) {
               {reading ? "⏹ Stop" : "🔊 Read"}
             </button>
 
+            {/* Hide pause/resume on mobile, show only on desktop */}
             {reading && (
               <button
                 onClick={handlePauseResume}
-                className={`px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium shadow active:scale-95 transition-transform ${
-                  paused 
-                    ? "bg-green-500 text-white hover:bg-green-600" 
-                    : "bg-yellow-500 text-white hover:bg-yellow-600"
-                }`}
+                className="hidden md:flex px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium shadow active:scale-95 transition-transform bg-yellow-500 text-white hover:bg-yellow-600"
               >
                 {paused ? "▶️ Resume" : "⏸ Pause"}
               </button>
@@ -331,13 +328,10 @@ export default function BlogContent({ blog }: { blog: any }) {
 
               {reading ? (
                 <div className="flex space-x-2 md:space-x-3">
+                  {/* Hide pause/resume on mobile, show only on desktop */}
                   <button
                     onClick={handlePauseResume}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium shadow active:scale-95 transition-transform ${
-                      paused 
-                        ? "bg-green-500 text-white hover:bg-green-600" 
-                        : "bg-yellow-500 text-white hover:bg-yellow-600"
-                    }`}
+                    className="hidden md:flex px-3 py-2 rounded-lg text-sm font-medium shadow active:scale-95 transition-transform bg-yellow-500 text-white hover:bg-yellow-600"
                   >
                     {paused ? "▶️" : "⏸"}
                   </button>
