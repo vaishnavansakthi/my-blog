@@ -305,14 +305,14 @@ export default function BlogContent({ blog }: { blog: any }) {
 
       {/* Fixed bottom control bar - mobile optimized */}
       {(reading || showControls) && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 shadow-lg py-3 px-4 md:py-4 md:px-6 z-50">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95  backdrop-blur-sm border-t border-gray-200 shadow-lg py-3 px-4 md:py-4 md:px-6 z-50">
           <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
             <div className="flex items-center space-x-3 md:space-x-4">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-700">
                 {reading ? "📖 Reading" : "📝 Controls"}
               </span>
               {currentIndex !== null && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                <span className="text-xs text-gray-500 bg-gray-100  px-2 py-1 rounded">
                   {currentIndex + 1}/{paragraphsRef.current.length}
                 </span>
               )}
