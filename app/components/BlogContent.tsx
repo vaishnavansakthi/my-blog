@@ -19,6 +19,7 @@ export default function BlogContent({ blog }: { blog: any }) {
   const pausedRef = useRef(paused);
   const currentParagraphRef = useRef<number>(0);
   const paragraphsRef = useRef<string[]>([]);
+  const isScrollingRef = useRef(false);
 
   // Sync refs with state
   useEffect(() => {
@@ -65,21 +66,37 @@ export default function BlogContent({ blog }: { blog: any }) {
     };
   }, []);
 
-  // Highlight current paragraph
+  // Highlight current paragraph with better mobile scrolling
   useEffect(() => {
     const paragraphs = Array.from(document.querySelectorAll(".blog-content p"));
     paragraphs.forEach((p, i) => {
       if (currentIndex !== null && i === currentIndex) {
         p.classList.add("highlight");
-        // Only auto-scroll if controls are not visible (user isn't manually scrolling)
-        if (!showControls) {
-          p.scrollIntoView({ behavior: "smooth", block: "center" });
+        
+        // Improved mobile scrolling
+        if (!isScrollingRef.current) {
+          const element = p as HTMLElement;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - 100; // Offset for mobile header
+
+          // Use smooth scroll for desktop, instant for mobile for better performance
+          const isMobile = window.innerWidth < 768;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: isMobile ? 'auto' : 'smooth'
+          });
+
+          // Prevent multiple scrolls
+          isScrollingRef.current = true;
+          setTimeout(() => {
+            isScrollingRef.current = false;
+          }, 1000);
         }
       } else {
         p.classList.remove("highlight");
       }
     });
-  }, [currentIndex, showControls]);
+  }, [currentIndex]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -103,7 +120,7 @@ export default function BlogContent({ blog }: { blog: any }) {
 
     const utterance = new SpeechSynthesisUtterance(paragraphs[startIndex]);
     utterance.voice = femaleVoice || null;
-    utterance.rate = 1;
+    utterance.rate = 0.9; // Slightly slower for better mobile comprehension
     utterance.pitch = 1;
     utterance.lang = femaleVoice?.lang || "en-US";
 
@@ -116,8 +133,10 @@ export default function BlogContent({ blog }: { blog: any }) {
     utterance.onend = () => {
       // Use refs to get fresh state values
       if (readingRef.current && !pausedRef.current) {
-        // Move to next paragraph
-        speakNextParagraph(startIndex + 1);
+        // Small delay for better user experience on mobile
+        setTimeout(() => {
+          speakNextParagraph(startIndex + 1);
+        }, 300);
       }
     };
 
@@ -127,6 +146,11 @@ export default function BlogContent({ blog }: { blog: any }) {
       setPaused(false);
       setCurrentIndex(null);
     };
+
+    // Mobile-specific voice settings
+    if (window.innerWidth < 768) {
+      utterance.rate = 0.85; // Even slower for mobile
+    }
 
     window.speechSynthesis.speak(utterance);
   };
@@ -156,26 +180,30 @@ export default function BlogContent({ blog }: { blog: any }) {
     paragraphsRef.current = paragraphs;
     setReading(true);
     setPaused(false);
+    
+    // Reset scrolling state
+    isScrollingRef.current = false;
+    
     speakNextParagraph(0);
   };
 
   const handlePauseResume = () => {
     if (!reading) return;
 
-    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-      // Pause
-      window.speechSynthesis.pause();
-      setPaused(true);
-    } else if (window.speechSynthesis.paused) {
-      // Resume
-      window.speechSynthesis.resume();
-      setPaused(false);
-    } else if (paused) {
-      // If paused but not speaking, restart from current paragraph
-      const currentIndex = currentParagraphRef.current;
-      if (currentIndex !== null) {
-        speakNextParagraph(currentIndex);
+    // Mobile-friendly pause/resume with better state checking
+    if (window.speechSynthesis.speaking) {
+      if (!window.speechSynthesis.paused) {
+        // Pause
+        window.speechSynthesis.pause();
+        setPaused(true);
+      } else {
+        // Resume
+        window.speechSynthesis.resume();
+        setPaused(false);
       }
+    } else if (paused && currentParagraphRef.current !== null) {
+      // Restart from current paragraph if paused but not speaking
+      speakNextParagraph(currentParagraphRef.current);
     }
   };
 
@@ -207,9 +235,9 @@ export default function BlogContent({ blog }: { blog: any }) {
 
   return (
     <>
-      <article className="max-w-4xl mx-auto px-6 md:px-8 py-10 leading-relaxed pb-24">
-        <header className="mb-8 text-center">
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-4 text-gray-900">
+      <article className="max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-10 leading-relaxed pb-32 md:pb-24">
+        <header className="mb-6 md:mb-8 text-center">
+          <h1 className="text-2xl md:text-5xl font-extrabold mb-3 md:mb-4 text-gray-900">
             {blog.title}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base">
@@ -220,29 +248,29 @@ export default function BlogContent({ blog }: { blog: any }) {
             })}
           </p>
 
-          <div className="flex justify-center gap-3 mt-6">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mt-4 md:mt-6">
             <button
               onClick={handleShare}
-              className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium shadow"
+              className="px-3 py-2 md:px-4 md:py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium shadow active:scale-95 transition-transform"
             >
               📤 Share
             </button>
 
             <button
               onClick={handleReadBlog}
-              className={`px-4 py-2 rounded-lg text-sm font-medium shadow ${
+              className={`px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium shadow active:scale-95 transition-transform ${
                 reading
                   ? "bg-red-500 text-white hover:bg-red-600"
                   : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
             >
-              {reading ? "⏹ Stop Reading" : "🔊 Read Blog"}
+              {reading ? "⏹ Stop" : "🔊 Read"}
             </button>
 
             {reading && (
               <button
                 onClick={handlePauseResume}
-                className={`px-4 py-2 rounded-lg text-sm font-medium shadow ${
+                className={`px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium shadow active:scale-95 transition-transform ${
                   paused 
                     ? "bg-green-500 text-white hover:bg-green-600" 
                     : "bg-yellow-500 text-white hover:bg-yellow-600"
@@ -254,7 +282,7 @@ export default function BlogContent({ blog }: { blog: any }) {
           </div>
         </header>
 
-        <div className="blog-content prose prose-lg md:prose-xl max-w-none prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-xl prose-img:mx-auto">
+        <div className="blog-content prose prose-base md:prose-lg lg:prose-xl max-w-none prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-xl prose-img:mx-auto">
           {renderRichText(blog.content)}
         </div>
 
@@ -262,61 +290,71 @@ export default function BlogContent({ blog }: { blog: any }) {
           .highlight {
             background-color: #fef3cd;
             transition: background-color 0.3s ease;
-            padding: 8px 12px;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 8px -16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          }
+          
+          @media (max-width: 768px) {
+            .highlight {
+              padding: 10px 12px;
+              margin: 6px -8px;
+              border-radius: 6px;
+            }
           }
         `}</style>
       </article>
 
-      {/* Fixed bottom control bar */}
+      {/* Fixed bottom control bar - mobile optimized */}
       {(reading || showControls) && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg py-4 px-6 z-50">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 shadow-lg py-3 px-4 md:py-4 md:px-6 z-50">
+          <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
+            <div className="flex items-center space-x-3 md:space-x-4">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {reading ? "Now Reading" : "Blog Controls"}
+                {reading ? "📖 Reading" : "📝 Controls"}
               </span>
               {currentIndex !== null && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Paragraph {currentIndex + 1} of {paragraphsRef.current.length}
+                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                  {currentIndex + 1}/{paragraphsRef.current.length}
                 </span>
               )}
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-between md:justify-end space-x-2 md:space-x-3">
               <button
                 onClick={handleShare}
-                className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium shadow"
+                className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium shadow active:scale-95 transition-transform"
               >
-                📤 Share
+                📤
               </button>
 
               {reading ? (
-                <>
+                <div className="flex space-x-2 md:space-x-3">
                   <button
                     onClick={handlePauseResume}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium shadow ${
+                    className={`px-3 py-2 rounded-lg text-sm font-medium shadow active:scale-95 transition-transform ${
                       paused 
                         ? "bg-green-500 text-white hover:bg-green-600" 
                         : "bg-yellow-500 text-white hover:bg-yellow-600"
                     }`}
                   >
-                    {paused ? "▶️ Resume" : "⏸ Pause"}
+                    {paused ? "▶️" : "⏸"}
                   </button>
                   
                   <button
                     onClick={handleStopReading}
-                    className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 text-sm font-medium shadow"
+                    className="px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 text-sm font-medium shadow active:scale-95 transition-transform"
                   >
-                    ⏹ Stop
+                    ⏹
                   </button>
-                </>
+                </div>
               ) : (
                 <button
                   onClick={handleReadBlog}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium shadow"
+                  className="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium shadow active:scale-95 transition-transform"
                 >
-                  🔊 Read Blog
+                  🔊 Read
                 </button>
               )}
             </div>
