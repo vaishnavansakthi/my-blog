@@ -19,8 +19,6 @@ export default async function Home() {
 
   const { data } = await res.json();
 
-  console.log("Fetched data:", data?.blogCollection?.items);
-
   const entries = data?.blogCollection?.items ?? [];
 
 //   const mockBlogs = Array.from({ length: 200 }).map((_, i) => ({
