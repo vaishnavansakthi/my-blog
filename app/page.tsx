@@ -1,6 +1,5 @@
- 
+
 import HeroLanding from "./components/HeroLanding"
-import Navbar from "./components/Navbar";
 import BlogList from "./BlogList";
 
 import { GRAPHQL_ENDPOINT, ACCESS_TOKEN } from "./constants/constants";
@@ -23,6 +22,19 @@ export default async function Home() {
   console.log("Fetched data:", data?.blogCollection?.items);
 
   const entries = data?.blogCollection?.items ?? [];
+
+//   const mockBlogs = Array.from({ length: 200 }).map((_, i) => ({
+//   _id: `blog-${i}`,
+//   slug: `blog-${i}`,
+//   title: `Understanding React Concepts ${i + 1}`,
+//   description:
+//     "A deep dive into React patterns, component design, and modern hooks usage.",
+//   featuredImage: {
+//     url: `https://picsum.photos/seed/${i}/400/300`,
+//     title: `Blog Image ${i + 1}`,
+//   },
+//   publishedDate: new Date(Date.now() - i * 86400000).toISOString(),
+// }));
 
   return (
     <main>
