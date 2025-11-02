@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import { AnalyticsProvider } from "./AnalyticsProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,10 +55,30 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+       <head>
+        {/* Google Analytics Script */}
+        {(
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=G-H952GR6KXJ`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-H952GR6KXJ');
+              `}
+            </Script>
+          </>
+        )}
+      </head>
       <body
         className={`${inter.variable} ${dmSerif.variable} font-sans antialiased bg-gray-50 text-gray-900`}
         style={{ fontFamily: "var(--font-inter)" }}
       >
+        <AnalyticsProvider />
         <Navbar />
         {children}
       </body>
