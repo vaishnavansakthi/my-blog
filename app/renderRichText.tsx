@@ -51,7 +51,12 @@ function renderRichText(content: any) {
       },
 
       [BLOCKS.HEADING_2]: (_node, children) => (
-        <h2 className="text-2xl md:text-3xl font-bold mt-10 mb-4 text-gray-900 ">
+        <h2 className="text-xl md:text-xl font-bold mt-10 mb-4 text-gray-900 ">
+          {children}
+        </h2>
+      ),
+      [BLOCKS.HEADING_1]: (_node, children) => (
+        <h2 className="text-xl md:text-2xl font-bold mt-10 mb-4 text-gray-900 ">
           {children}
         </h2>
       ),
