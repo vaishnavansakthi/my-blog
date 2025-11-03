@@ -33,7 +33,12 @@ export default function BlogList({ entries }: { entries: any[] }) {
       className="container mx-auto px-4 max-md:px-1 md:px-40 py-10 dark:bg-[#141413]"
     >
       {/* 🔍 Search Bar */}
-      <div className="mb-6 flex justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="mb-6 flex justify-center"
+      >
         <div className="relative w-full md:w-1/2">
           {/* Search Icon */}
           <Search
@@ -56,9 +61,9 @@ export default function BlogList({ entries }: { entries: any[] }) {
             <button
               onClick={() => {
                 // 1. Reset the search term to clear the input
-                setSearchTerm(""); 
+                setSearchTerm("");
                 // 2. Explicitly reset the displayed list to the original full entries
-                setFilteredEntries(entries); 
+                setFilteredEntries(entries);
               }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
               aria-label="Clear search"
@@ -67,10 +72,13 @@ export default function BlogList({ entries }: { entries: any[] }) {
             </button>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Blog List */}
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         className="flex flex-col divide-y divide-gray-200 dark:divide-gray-100 p-5 rounded-lg"
       >
         {filteredEntries.length > 0 ? (
@@ -137,7 +145,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
             </p>
           </motion.div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
