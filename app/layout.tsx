@@ -4,6 +4,7 @@ import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import { AnalyticsProvider } from "./AnalyticsProvider";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,9 +21,7 @@ export const metadata: Metadata = {
   title: "Vaishnavan's Blog",
   description: "Tech, lifestyle, and positivity — all in one place!",
   icons: {
-    icon: [
-      { url: "/file.svg", type: "image/svg" }
-    ]
+    icon: [{ url: "/file.svg", type: "image/svg" }],
   },
   openGraph: {
     title: "VaishnavanM Blog's",
@@ -54,10 +53,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-       <head>
+    <html lang="en" suppressHydrationWarning>
+      <head>
         {/* Google Analytics Script */}
-        {(
+        {
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=G-H952GR6KXJ`}
@@ -72,15 +71,17 @@ export default function RootLayout({
               `}
             </Script>
           </>
-        )}
+        }
       </head>
       <body
-        className={`${inter.variable} ${dmSerif.variable} font-sans antialiased bg-gray-50 text-gray-900`}
+        className={`${inter.variable} ${dmSerif.variable} font-sans antialiased bg-gray-50 text-gray-900 dark:bg-[#141413]`}
         style={{ fontFamily: "var(--font-inter)" }}
       >
-        <AnalyticsProvider />
-        <Navbar />
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AnalyticsProvider />
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

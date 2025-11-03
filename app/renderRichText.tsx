@@ -28,7 +28,7 @@ function renderRichText(content: any) {
 
     renderNode: {
       [BLOCKS.PARAGRAPH]: (_node, children) => (
-        <p className="text-gray-800 mb-6 leading-relaxed text-lg">
+        <p className="text-gray-800 mb-6 leading-relaxed text-lg dark:text-white">
           {children}
         </p>
       ),
@@ -51,12 +51,12 @@ function renderRichText(content: any) {
       },
 
       [BLOCKS.HEADING_2]: (_node, children) => (
-        <h2 className="text-xl md:text-xl font-bold mt-10 mb-4 text-gray-900 ">
+        <h2 className="text-xl md:text-xl font-bold mt-10 mb-4 text-gray-900 dark:text-white">
           {children}
         </h2>
       ),
       [BLOCKS.HEADING_1]: (_node, children) => (
-        <h2 className="text-xl md:text-2xl font-bold mt-10 mb-4 text-gray-900 ">
+        <h2 className="text-xl md:text-2xl font-bold mt-10 mb-4 text-gray-900 dark:text-white">
           {children}
         </h2>
       ),

@@ -71,7 +71,7 @@ export default function BlogContent({ blog }: { blog: any }) {
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <motion.h1
-            className="text-2xl md:text-5xl font-extrabold mb-3 md:mb-4 text-gray-900"
+            className="text-2xl md:text-5xl font-extrabold mb-3 md:mb-4 text-gray-900 dark:text-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
@@ -117,7 +117,7 @@ export default function BlogContent({ blog }: { blog: any }) {
 
         {/* Animated Blog Content */}
         <motion.div
-          className="blog-content prose prose-base md:prose-lg lg:prose-xl max-w-none prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-xl prose-img:mx-auto dark:prose-invert"
+          className="blog-content prose prose-base md:prose-lg lg:prose-xl max-w-none prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-xl prose-img:mx-auto dark:prose-invert dark:text-white"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.8 }}
@@ -134,11 +134,11 @@ export default function BlogContent({ blog }: { blog: any }) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-lg py-3 px-4 md:py-4 md:px-6 z-50"
+            className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#141413] backdrop-blur-sm border-t border-gray-100 dark:border-none shadow-lg py-3 px-4 md:py-4 md:px-6 z-50"
           >
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
               <div className="flex items-center space-x-3 md:space-x-4">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-white">
                   📝 {blog.title}
                 </span>
               </div>

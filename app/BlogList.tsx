@@ -30,7 +30,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
   return (
     <div
       id="blogs"
-      className="container mx-auto px-4 max-md:px-1 md:px-40 py-10"
+      className="container mx-auto px-4 max-md:px-1 md:px-40 py-10 dark:bg-[#141413]"
     >
       {/* 🔍 Search Bar */}
       <div className="mb-6 flex justify-center">
@@ -48,7 +48,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
             placeholder="Search blogs..."
             className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg shadow-sm 
                  focus:outline-none
-                 bg-white transition-all duration-300"
+                 transition-all duration-300 dark:text-white"
           />
 
           {/* Clear Icon */}
@@ -91,7 +91,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
               <Link
                 key={entry._id}
                 href={`/blog/${entry.slug}`}
-                className="flex flex-col md:flex-row items-start justify-between py-8 gap-4 md:gap-8 transition-all duration-300 rounded-xl hover:bg-gray-50"
+                className="flex flex-col md:flex-row items-start justify-between py-8 gap-4 md:gap-8 transition-all duration-300 rounded-xl"
               >
                 {/* IMAGE SECTION */}
                 {entry.featuredImage && (
@@ -109,7 +109,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
                 {/* CONTENT SECTION */}
                 <div className="flex-1 order-2 md:order-1 mt-4 md:mt-0">
                   {/* TITLE */}
-                  <h2 className="text-xl md:text-3xl font-extrabold text-gray-900 mb-2 leading-snug">
+                  <h2 className="text-xl md:text-3xl font-extrabold text-gray-900 mb-2 leading-snug dark:text-white">
                     {entry.title}
                   </h2>
 
