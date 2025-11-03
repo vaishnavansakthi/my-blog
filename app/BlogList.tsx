@@ -54,7 +54,12 @@ export default function BlogList({ entries }: { entries: any[] }) {
           {/* Clear Icon */}
           {searchTerm && (
             <button
-              onClick={() => setSearchTerm("")}
+              onClick={() => {
+                // 1. Reset the search term to clear the input
+                setSearchTerm(""); 
+                // 2. Explicitly reset the displayed list to the original full entries
+                setFilteredEntries(entries); 
+              }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
               aria-label="Clear search"
             >
@@ -65,18 +70,8 @@ export default function BlogList({ entries }: { entries: any[] }) {
       </div>
 
       {/* Blog List */}
-      <motion.div
+      <div
         className="flex flex-col divide-y divide-gray-200 dark:divide-gray-100 p-5 rounded-lg"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: {},
-          visible: {
-            transition: {
-              staggerChildren: 0.12, // delay between each item
-            },
-          },
-        }}
       >
         {filteredEntries.length > 0 ? (
           filteredEntries.map((entry) => (
@@ -142,7 +137,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
             </p>
           </motion.div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }
