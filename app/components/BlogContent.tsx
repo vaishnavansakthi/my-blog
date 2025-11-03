@@ -1,12 +1,17 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import renderRichText from "../renderRichText";
 
 export default function BlogContent({ blog }: { blog: any }) {
   const [showControls, setShowControls] = useState(false);
+  const [readingTime, setReadingTime] = useState<number>(0);
+  const [isReading, setIsReading] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Show/hide controls on scroll
   useEffect(() => {
@@ -14,6 +19,95 @@ export default function BlogContent({ blog }: { blog: any }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Calculate estimated reading time
+  useEffect(() => {
+    if (!blog?.content) return;
+
+    const plainText = JSON.stringify(blog.content)
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ");
+
+    const wordsPerMinute = 200;
+    const wordCount = plainText.split(" ").length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    setReadingTime(minutes);
+  }, [blog]);
+
+  // 🗣️ Text-to-Speech controls
+  const startReading = () => {
+  if (!window.speechSynthesis) {
+    alert("Sorry, your browser does not support speech synthesis.");
+    return;
+  }
+
+  // Cancel any ongoing speech
+  if (utteranceRef.current) {
+    window.speechSynthesis.cancel();
+  }
+
+  // ✅ Wait until voices are loaded before creating utterance
+  const loadVoicesAndSpeak = () => {
+    const voices = window.speechSynthesis.getVoices();
+
+    if (!voices.length) {
+      // Chrome sometimes needs time to load voices
+      window.speechSynthesis.onvoiceschanged = () => {
+        loadVoicesAndSpeak();
+      };
+      return;
+    }
+
+    const plainText = document.querySelector(".blog-content")?.textContent || "";
+    const utterance = new SpeechSynthesisUtterance(plainText);
+
+    // Pick a default English female voice if available
+    const selectedVoice =
+      voices.find((v) => v.lang.startsWith("en") && v.name.includes("Female")) ||
+      voices.find((v) => v.lang.startsWith("en")) ||
+      voices[0];
+
+    if (selectedVoice) utterance.voice = selectedVoice;
+
+    utterance.lang = "en-US";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    utterance.onend = () => {
+      setIsReading(false);
+      setIsPaused(false);
+    };
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+    setIsReading(true);
+    setIsPaused(false);
+  };
+
+  loadVoicesAndSpeak();
+};
+
+
+  const pauseReading = () => {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+      setIsPaused(true);
+    }
+  };
+
+  const resumeReading = () => {
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      setIsPaused(false);
+    }
+  };
+
+  const stopReading = () => {
+    window.speechSynthesis.cancel();
+    setIsReading(false);
+    setIsPaused(false);
+  };
 
   // Share functionality
   const handleShare = async () => {
@@ -35,13 +129,6 @@ export default function BlogContent({ blog }: { blog: any }) {
         alert("Link copied to clipboard!");
       } catch (err) {
         console.error("Failed to copy:", err);
-        const textArea = document.createElement("textarea");
-        textArea.value = window.location.href;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
-        alert("Link copied to clipboard!");
       }
     }
   };
@@ -65,18 +152,25 @@ export default function BlogContent({ blog }: { blog: any }) {
             {blog.title}
           </motion.h1>
 
-          <motion.p
-            className="text-gray-500 dark:text-gray-400 text-sm md:text-base"
+          <motion.div
+            className="text-gray-500 dark:text-gray-400 text-sm md:text-base flex justify-center items-center gap-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            {new Date(blog.publishedDate).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </motion.p>
+            <span>
+              {new Date(blog.publishedDate).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+            {readingTime > 0 && (
+              <span className="text-gray-400 dark:text-gray-500">
+                • {readingTime} min read
+              </span>
+            )}
+          </motion.div>
 
           <motion.div
             className="flex flex-wrap justify-center gap-2 md:gap-3 mt-4 md:mt-6"
@@ -92,6 +186,46 @@ export default function BlogContent({ blog }: { blog: any }) {
             >
               📤 Share
             </button>
+
+            {/* 🎧 TTS Controls */}
+            {!isReading ? (
+              <button
+                onClick={startReading}
+                className="px-3 py-2 md:px-4 md:py-2 rounded-lg bg-blue-100 hover:bg-blue-200 
+                  dark:bg-blue-800 dark:hover:bg-blue-700 text-blue-700 dark:text-blue-200 
+                  text-sm font-medium shadow active:scale-95 transition-transform"
+              >
+                🎧 Listen
+              </button>
+            ) : isPaused ? (
+              <button
+                onClick={resumeReading}
+                className="px-3 py-2 md:px-4 md:py-2 rounded-lg bg-green-100 hover:bg-green-200 
+                  dark:bg-green-800 dark:hover:bg-green-700 text-green-700 dark:text-green-200 
+                  text-sm font-medium shadow active:scale-95 transition-transform"
+              >
+                ▶️ Resume
+              </button>
+            ) : (
+              <button
+                onClick={pauseReading}
+                className="px-3 py-2 md:px-4 md:py-2 rounded-lg bg-yellow-100 hover:bg-yellow-200 
+                  dark:bg-yellow-800 dark:hover:bg-yellow-700 text-yellow-700 dark:text-yellow-200 
+                  text-sm font-medium shadow active:scale-95 transition-transform"
+              >
+                ⏸ Pause
+              </button>
+            )}
+            {isReading && (
+              <button
+                onClick={stopReading}
+                className="px-3 py-2 md:px-4 md:py-2 rounded-lg bg-red-100 hover:bg-red-200 
+                  dark:bg-red-800 dark:hover:bg-red-700 text-red-700 dark:text-red-200 
+                  text-sm font-medium shadow active:scale-95 transition-transform"
+              >
+                ⏹ Stop
+              </button>
+            )}
           </motion.div>
         </motion.header>
 
@@ -121,6 +255,11 @@ export default function BlogContent({ blog }: { blog: any }) {
                 <span className="text-sm font-medium text-gray-700">
                   📝 {blog.title}
                 </span>
+                {readingTime > 0 && (
+                  <span className="text-xs text-gray-500">
+                    • {readingTime} min read
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center justify-between md:justify-end space-x-2 md:space-x-3">
