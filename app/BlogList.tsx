@@ -79,7 +79,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="flex flex-col divide-y divide-gray-200 dark:divide-gray-100 p-5 rounded-lg"
+        className="flex flex-col divide-y divide-gray-200 dark:divide-gray-800 p-5 rounded-lg"
       >
         {filteredEntries.length > 0 ? (
           filteredEntries.map((entry) => (
