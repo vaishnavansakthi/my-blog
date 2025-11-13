@@ -20,7 +20,7 @@ function renderRichText(content: any) {
   const options: Options = {
     renderMark: {
       [MARKS.CODE]: (text: React.ReactNode) => (
-        <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">
+        <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono dark:bg-gray-800">
           {text}
         </code>
       ),
