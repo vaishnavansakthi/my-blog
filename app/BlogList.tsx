@@ -3,6 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getTimeAgo } from "./utils/getTimeAgo";
 import React, { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
@@ -14,11 +15,30 @@ export default function BlogList({ entries }: { entries: any[] }) {
   const [filteredEntries, setFilteredEntries] = useState(entries);
   const [loading, setLoading] = useState(true);
 
+  const router: any = useRouter();
+
   // Simulate loading for smooth placeholder experience
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 700);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    const handleRouteChangeStart = (url: string) => {
+      // Only save if we're navigating away from the blog list
+      if (!url.includes("/blogs")) {
+        const scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop;
+        sessionStorage.setItem("blog-list-scroll", scrollTop.toString());
+      }
+    };
+
+    router?.events?.on("routeChangeStart", handleRouteChangeStart);
+
+    return () => {
+      router?.events?.off("routeChangeStart", handleRouteChangeStart);
+    };
+  }, [router]);
 
   // Debounce search
   useEffect(() => {
