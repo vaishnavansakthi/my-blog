@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image";
-import {
-  BLOCKS,
-  INLINES,
-  MARKS,
-  Document,
-} from "@contentful/rich-text-types";
+import { BLOCKS, INLINES, MARKS, Document } from "@contentful/rich-text-types";
 import {
   documentToReactComponents,
   Options,
 } from "@contentful/rich-text-react-renderer";
+
+// Extract text from a paragraph that contains multiple code lines
+function extractCodeBlock(node: any) {
+  return node.content.map((child: any) => child.value || "").join("\n");
+}
 
 function renderRichText(content: any) {
   const assetMap = new Map();
@@ -19,19 +19,50 @@ function renderRichText(content: any) {
 
   const options: Options = {
     renderMark: {
+      // Inline code (single line)
       [MARKS.CODE]: (text: React.ReactNode) => (
-        <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono dark:bg-gray-800">
+        <code className="font-mono bg-gray-800 text-gray-100 px-1 py-0.5 rounded">
           {text}
         </code>
       ),
     },
 
     renderNode: {
-      [BLOCKS.PARAGRAPH]: (_node, children) => (
-        <p className="text-gray-800 mb-6 leading-relaxed text-lg dark:text-white">
-          {children}
-        </p>
-      ),
+      // Detect paragraph that actually contains a code block
+      [BLOCKS.PARAGRAPH]: (node, children) => {
+        const isCodeBlock = node.content.every(
+          (child: any) =>
+            child.marks?.some((mark: any) => mark.type === "code")
+        );
+
+        // MULTI-LINE CODE BLOCK (because Contentful does not support BLOCKS.CODE)
+        if (isCodeBlock) {
+          const codeText = extractCodeBlock(node);
+
+          return (
+            <div className="relative my-6">
+              {/* Copy button */}
+              <button
+                className="absolute top-3 right-3 bg-gray-700 text-white text-xs px-2 py-1 rounded hover:bg-gray-600"
+                onClick={() => navigator.clipboard.writeText(codeText)}
+              >
+                Copy
+              </button>
+
+              <pre className="bg-[#0d1117] text-gray-200 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre">
+                <code>{codeText}</code>
+              </pre>
+            </div>
+          );
+        }
+
+        // NORMAL PARAGRAPH
+        return (
+          <p className="text-gray-800 mb-6 leading-relaxed text-lg dark:text-white">
+            {children}
+          </p>
+        );
+      },
 
       [BLOCKS.EMBEDDED_ASSET]: (node) => {
         const asset = assetMap.get(node.data.target.sys.id);
@@ -55,6 +86,7 @@ function renderRichText(content: any) {
           {children}
         </h2>
       ),
+
       [BLOCKS.HEADING_1]: (_node, children) => (
         <h2 className="text-xl md:text-2xl font-bold mt-10 mb-4 text-gray-900 dark:text-white">
           {children}
@@ -66,6 +98,7 @@ function renderRichText(content: any) {
           {children}
         </blockquote>
       ),
+
       [INLINES.HYPERLINK]: (node, children) => (
         <a
           href={node.data.uri}
