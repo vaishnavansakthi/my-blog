@@ -93,7 +93,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
             >
               <Link
                 key={entry._id}
-                href={`/blog/${entry.slug}`}
+                href={`/${entry.slug}`}
                 className="flex flex-col md:flex-row items-start justify-between py-8 gap-4 md:gap-8 transition-all duration-300 rounded-xl"
               >
                 {/* IMAGE SECTION */}
@@ -117,7 +117,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
                   </h2>
 
                   {/* DESCRIPTION */}
-                  <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base mb-4 max-w-2xl">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base mb-4 max-w-2xl line-clamp-2">
                     {entry.description ||
                       "Learn Composition, Render Props, and Hooks to scale your React components together with your team without tech debt."}
                   </p>

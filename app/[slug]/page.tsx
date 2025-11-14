@@ -1,5 +1,5 @@
-import { GRAPHQL_ENDPOINT, ACCESS_TOKEN } from "../../constants/constants";
-import BlogContent from "../../components/BlogContent";
+import { GRAPHQL_ENDPOINT, ACCESS_TOKEN } from "../constants/constants";
+import BlogContent from "../components/BlogContent";
 
 async function getBlogBySlug(slug: string) {
   const query = `
