@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export default function HeroLanding() {
   return (
-    <section className="text-center py-16 max-md:py-10 transition-colors duration-300 overflow-hidden">
+    <section className="text-center py-20 max-md:py-10 transition-colors duration-300 overflow-hidden">
       <div className="container mx-auto px-6">
         {/* Intro */}
         <motion.h2

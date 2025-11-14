@@ -72,7 +72,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
   return (
     <div
       id="blogs"
-      className="container mx-auto px-4 max-md:px-1 md:px-40 dark:bg-[#141413]"
+      className="container mx-auto px-4 max-md:px-1 md:px-40 py-10 dark:bg-[#141413]"
     >
       {/* SEARCH BAR */}
       <motion.div
