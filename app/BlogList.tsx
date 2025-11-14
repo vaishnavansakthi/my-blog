@@ -12,6 +12,13 @@ import { Virtuoso } from "react-virtuoso";
 export default function BlogList({ entries }: { entries: any[] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEntries, setFilteredEntries] = useState(entries);
+  const [loading, setLoading] = useState(true);
+
+  // Simulate loading for smooth placeholder experience
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 700);
+    return () => clearTimeout(t);
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -27,6 +34,20 @@ export default function BlogList({ entries }: { entries: any[] }) {
 
     return () => clearTimeout(handler);
   }, [searchTerm, entries]);
+
+  // Skeleton Placeholder Component
+  const BlogSkeleton = () => (
+    <div className="animate-pulse py-8 flex flex-col md:flex-row gap-4 md:gap-8">
+      <div className="flex-1 space-y-3">
+        <div className="h-6 w-3/4 bg-gray-300 dark:bg-gray-700 rounded"></div>
+        <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded"></div>
+        <div className="h-4 w-5/6 bg-gray-300 dark:bg-gray-700 rounded"></div>
+        <div className="h-3 w-1/4 bg-gray-300 dark:bg-gray-700 rounded mt-3"></div>
+      </div>
+
+      <div className="w-full md:w-60 h-48 md:h-36 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
+    </div>
+  );
 
   return (
     <div
@@ -51,7 +72,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search blogs..."
             className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg shadow-sm 
-                 focus:outline-none transition-all duration-300 dark:text-white"
+            focus:outline-none transition-all duration-300 dark:text-white"
           />
 
           {searchTerm && (
@@ -69,8 +90,17 @@ export default function BlogList({ entries }: { entries: any[] }) {
       </motion.div>
 
       {/* VIRTUALIZED LIST */}
-      <div className="virtuoso-scroll-wrapper" style={{ height: "75vh" }}>
-        {filteredEntries.length > 0 ? (
+      <div
+        className="virtuoso-scroll-wrapper no-scrollbar"
+        style={{ height: "75vh" }}
+      >
+        {loading ? (
+          <div className="space-y-8">
+            {[...Array(filteredEntries.length)].map((_, i) => (
+              <BlogSkeleton key={i} />
+            ))}
+          </div>
+        ) : filteredEntries.length > 0 ? (
           <Virtuoso
             className="no-scrollbar"
             data={filteredEntries}
