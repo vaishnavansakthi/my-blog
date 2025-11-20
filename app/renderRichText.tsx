@@ -5,6 +5,7 @@ import {
   documentToReactComponents,
   Options,
 } from "@contentful/rich-text-react-renderer";
+import CodeBlock from "./components/CodeBlock";
 
 // Extract text from a paragraph that contains multiple code lines
 function extractCodeBlock(node: any) {
@@ -16,6 +17,69 @@ function renderRichText(content: any) {
   content?.links?.assets?.block?.forEach((asset: any) => {
     assetMap.set(asset.sys.id, asset);
   });
+
+  // Pre-process the content to merge consecutive code blocks
+  const processedContent = { ...content };
+  if (processedContent.json?.content) {
+    const mergedContent: any[] = [];
+    let codeBlockBuffer: string[] = [];
+    let inCodeBlock = false;
+
+    processedContent.json.content.forEach((node: any, index: number) => {
+      const isCodeParagraph =
+        node.nodeType === "paragraph" &&
+        node.content.every(
+          (child: any) => child.marks?.some((mark: any) => mark.type === "code")
+        );
+
+      if (isCodeParagraph) {
+        // Accumulate code lines
+        const codeText = node.content.map((child: any) => child.value || "").join("");
+        codeBlockBuffer.push(codeText);
+        inCodeBlock = true;
+      } else {
+        // If we were in a code block, flush it
+        if (inCodeBlock && codeBlockBuffer.length > 0) {
+          mergedContent.push({
+            nodeType: "paragraph",
+            data: {},
+            content: [
+              {
+                nodeType: "text",
+                value: codeBlockBuffer.join("\n"),
+                marks: [{ type: "code" }],
+                data: {},
+              },
+            ],
+            __isCodeBlock: true,
+          });
+          codeBlockBuffer = [];
+          inCodeBlock = false;
+        }
+        // Add the non-code node
+        mergedContent.push(node);
+      }
+    });
+
+    // Flush any remaining code block
+    if (inCodeBlock && codeBlockBuffer.length > 0) {
+      mergedContent.push({
+        nodeType: "paragraph",
+        data: {},
+        content: [
+          {
+            nodeType: "text",
+            value: codeBlockBuffer.join("\n"),
+            marks: [{ type: "code" }],
+            data: {},
+          },
+        ],
+        __isCodeBlock: true,
+      });
+    }
+
+    processedContent.json.content = mergedContent;
+  }
 
   const options: Options = {
     renderMark: {
@@ -30,30 +94,16 @@ function renderRichText(content: any) {
     renderNode: {
       // Detect paragraph that actually contains a code block
       [BLOCKS.PARAGRAPH]: (node, children) => {
-        const isCodeBlock = node.content.every(
-          (child: any) =>
-            child.marks?.some((mark: any) => mark.type === "code")
-        );
+        const isCodeBlock =
+          (node as any).__isCodeBlock ||
+          node.content.every(
+            (child: any) => child.marks?.some((mark: any) => mark.type === "code")
+          );
 
         // MULTI-LINE CODE BLOCK (because Contentful does not support BLOCKS.CODE)
         if (isCodeBlock) {
           const codeText = extractCodeBlock(node);
-
-          return (
-            <div className="relative my-6">
-              {/* Copy button */}
-              <button
-                className="absolute top-3 right-3 bg-gray-700 text-white text-xs px-2 py-1 rounded hover:bg-gray-600"
-                onClick={() => navigator.clipboard.writeText(codeText)}
-              >
-                Copy
-              </button>
-
-              <pre className="bg-[#0d1117] text-gray-200 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre">
-                <code>{codeText}</code>
-              </pre>
-            </div>
-          );
+          return <CodeBlock code={codeText} />;
         }
 
         // NORMAL PARAGRAPH
@@ -112,7 +162,7 @@ function renderRichText(content: any) {
     },
   };
 
-  return documentToReactComponents(content.json as Document, options);
+  return documentToReactComponents(processedContent.json as Document, options);
 }
 
 export default renderRichText;

@@ -5,6 +5,7 @@
 .blog-content p {
   transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
+
 .blog-content p.highlight {
   background: rgba(224, 240, 255, 0.8);
   border-radius: 6px;
@@ -31,3 +32,17 @@
   scrollbar-width: none;
 }
 
+/* Shiki syntax highlighting styles */
+.shiki-wrapper pre {
+  @apply p-4 rounded-lg overflow-x-auto text-sm font-mono my-0;
+  background-color: #0d1117 !important;
+}
+
+.shiki-wrapper code {
+  @apply font-mono text-sm;
+  background: transparent !important;
+}
+
+.shiki-wrapper pre code {
+  @apply block;
+}
