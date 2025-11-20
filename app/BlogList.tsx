@@ -3,7 +3,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { getTimeAgo } from "./utils/getTimeAgo";
 import React, { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
@@ -13,9 +12,8 @@ import { Virtuoso } from "react-virtuoso";
 export default function BlogList({ entries }: { entries: any[] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEntries, setFilteredEntries] = useState(entries);
-  const [loading, setLoading] = useState(true);
-
-  const router: any = useRouter();
+  const [loading, setLoading] = useState(entries.length > 0);
+  const [initialScrollIndex, setInitialScrollIndex] = useState(0);
 
   // Simulate loading for smooth placeholder experience
   useEffect(() => {
@@ -23,22 +21,16 @@ export default function BlogList({ entries }: { entries: any[] }) {
     return () => clearTimeout(t);
   }, []);
 
+  // Restore scroll position on mount
   useEffect(() => {
-    const handleRouteChangeStart = (url: string) => {
-      // Only save if we're navigating away from the blog list
-      if (!url.includes("/blogs")) {
-        const scrollTop =
-          document.documentElement.scrollTop || document.body.scrollTop;
-        sessionStorage.setItem("blog-list-scroll", scrollTop.toString());
-      }
-    };
-
-    router?.events?.on("routeChangeStart", handleRouteChangeStart);
-
-    return () => {
-      router?.events?.off("routeChangeStart", handleRouteChangeStart);
-    };
-  }, [router]);
+    const savedIndex = sessionStorage.getItem("blog-list-scroll-index");
+    if (savedIndex) {
+      const index = parseInt(savedIndex, 10);
+      setInitialScrollIndex(index);
+      // Clear after restoring to avoid restoring on every visit
+      sessionStorage.removeItem("blog-list-scroll-index");
+    }
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -54,6 +46,11 @@ export default function BlogList({ entries }: { entries: any[] }) {
 
     return () => clearTimeout(handler);
   }, [searchTerm, entries]);
+
+  // Save scroll position when clicking a blog
+  const handleBlogClick = (index: number) => {
+    sessionStorage.setItem("blog-list-scroll-index", index.toString());
+  };
 
   // Skeleton Placeholder Component
   const BlogSkeleton = () => (
@@ -124,6 +121,8 @@ export default function BlogList({ entries }: { entries: any[] }) {
           <Virtuoso
             className="no-scrollbar"
             data={filteredEntries}
+            initialTopMostItemIndex={initialScrollIndex}
+            overscan={200}
             itemContent={(index, entry) => (
               <motion.div
                 key={entry._id}
@@ -133,6 +132,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
               >
                 <Link
                   href={`/${entry.slug}`}
+                  onClick={() => handleBlogClick(index)}
                   className="flex flex-col md:flex-row items-start justify-between py-8 gap-4 md:gap-8 rounded-xl"
                 >
                   {/* IMAGE */}
