@@ -77,32 +77,60 @@ export default function BlogList({ entries }: { entries: any[] }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="sticky top-0 z-10 bg-white dark:bg-[#141413] pt-4 pb-8 mb-8 flex justify-center"
+        className="sticky top-0 z-10 dark:bg-[#141413] pt-4 pb-8 mb-8 flex justify-center"
       >
-        <div className="relative w-full md:w-1/2">
+        <div className="relative w-full md:w-2/3 lg:w-1/2">
+          {/* Search Icon */}
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 transition-colors"
+            size={20}
           />
 
+          {/* Search Input */}
           <input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search blogs..."
-            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg shadow-sm 
-            focus:outline-none transition-all duration-300 dark:text-white"
+            className="w-full pl-12 pr-12 py-3.5 
+            bg-white dark:bg-gray-900/50
+            border-2 border-gray-200 dark:border-gray-700
+            rounded-2xl 
+            text-gray-900 dark:text-white
+            placeholder:text-gray-400 dark:placeholder:text-gray-500
+            focus:outline-none 
+            focus:border-purple-500 dark:focus:border-purple-400
+            focus:ring-4 focus:ring-purple-500/10 dark:focus:ring-purple-400/10
+            transition-all duration-300
+            shadow-sm hover:shadow-md
+            backdrop-blur-sm"
           />
 
+          {/* Clear Button */}
           {searchTerm && (
-            <button
+            <motion.button
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
               onClick={() => {
                 setSearchTerm("");
                 setFilteredEntries(entries);
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute right-4 top-1/2 -translate-y-1/2 
+              flex items-center justify-center
+              w-7 h-7 
+              rounded-full
+              mt-[-13px]
+              bg-gray-100 hover:bg-gray-200 
+              dark:bg-gray-800 dark:hover:bg-gray-700
+              text-gray-500 hover:text-gray-700 
+              dark:text-gray-400 dark:hover:text-gray-200
+              transition-all duration-200
+              hover:scale-110 active:scale-95"
+              aria-label="Clear search"
             >
-              <X size={18} />
-            </button>
+              <X size={16} strokeWidth={2.5} />
+            </motion.button>
           )}
         </div>
       </motion.div>
