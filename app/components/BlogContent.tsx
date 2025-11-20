@@ -9,6 +9,7 @@ import renderRichText from "../renderRichText";
 export default function BlogContent({ blog }: { blog: any }) {
   const [showControls, setShowControls] = useState(false);
   const [readingTime, setReadingTime] = useState<number | null>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Calculate reading time
   useEffect(() => {
@@ -22,9 +23,21 @@ export default function BlogContent({ blog }: { blog: any }) {
     }
   }, [blog]);
 
-  // Show/hide controls on scroll
+  // Show/hide controls on scroll and calculate progress
   useEffect(() => {
-    const handleScroll = () => setShowControls(window.scrollY > 100);
+    const handleScroll = () => {
+      setShowControls(window.scrollY > 100);
+
+      // Calculate scroll progress
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const trackLength = documentHeight - windowHeight;
+      const progress = (scrollTop / trackLength) * 100;
+
+      setScrollProgress(Math.min(progress, 100));
+    };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -62,6 +75,15 @@ export default function BlogContent({ blog }: { blog: any }) {
 
   return (
     <>
+      {/* Reading Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-50"
+        style={{ scaleX: scrollProgress / 100 }}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: scrollProgress / 100 }}
+        transition={{ duration: 0.1, ease: "easeOut" }}
+      />
+
       <article className="max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-10 leading-relaxed pb-32 md:pb-24">
         {/* Animated Header */}
         <motion.header
