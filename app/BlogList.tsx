@@ -151,7 +151,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
                     <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors">
                       {entry.title}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
                       {entry.description}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-500">
