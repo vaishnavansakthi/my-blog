@@ -134,8 +134,20 @@ export default function BlogList({ entries }: { entries: any[] }) {
                   className="block py-8 flex flex-col md:flex-row gap-4 md:gap-8 
                   transition-colors duration-200 rounded-lg px-4 -mx-4"
                 >
-                  {/* TEXT CONTENT */}
-                  <div className="flex-1">
+                  {/* IMAGE - First on mobile */}
+                  {entry.featuredImage?.url && (
+                    <div className="w-full md:w-60 h-48 md:h-36 relative overflow-hidden rounded-lg md:order-2">
+                      <Image
+                        src={entry.featuredImage.url}
+                        alt={entry.featuredImage.title || entry.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {/* TEXT CONTENT - Second on mobile */}
+                  <div className="flex-1 md:order-1">
                     <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors">
                       {entry.title}
                     </h2>
@@ -146,18 +158,6 @@ export default function BlogList({ entries }: { entries: any[] }) {
                       {getTimeAgo(entry.publishedDate)}
                     </p>
                   </div>
-
-                  {/* IMAGE */}
-                  {entry.featuredImage?.url && (
-                    <div className="w-full md:w-60 h-48 md:h-36 relative overflow-hidden rounded-lg">
-                      <Image
-                        src={entry.featuredImage.url}
-                        alt={entry.featuredImage.title || entry.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
                 </Link>
               </motion.div>
             ))
