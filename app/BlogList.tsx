@@ -118,7 +118,7 @@ export default function BlogList({ entries }: { entries: any[] }) {
       </motion.div>
 
       {/* BLOG LIST */}
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         {loading
           ? Array.from({ length: 5 }).map((_, i) => <BlogSkeleton key={i} />)
           : filteredEntries.length > 0
@@ -131,8 +131,8 @@ export default function BlogList({ entries }: { entries: any[] }) {
               >
                 <Link
                   href={`/${entry.slug}`}
-                  className="block py-8 flex flex-col md:flex-row gap-4 md:gap-8 
-                  transition-colors duration-200 rounded-lg px-4 -mx-4"
+                  className="block py-4 md:py-8 flex flex-col md:flex-row gap-3 md:gap-8 
+                  transition-colors duration-200 rounded-lg"
                 >
                   {/* IMAGE - First on mobile */}
                   {entry.featuredImage?.url && (
@@ -148,13 +148,13 @@ export default function BlogList({ entries }: { entries: any[] }) {
 
                   {/* TEXT CONTENT - Second on mobile */}
                   <div className="flex-1 md:order-1">
-                    <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors">
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-3 transition-colors">
                       {entry.title}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
+                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-3 md:mb-4 line-clamp-2">
                       {entry.description}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-500">
                       {getTimeAgo(entry.publishedDate)}
                     </p>
                   </div>
