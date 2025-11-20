@@ -71,12 +71,12 @@ export default function BlogList({ entries }: { entries: any[] }) {
       id="blogs"
       className="container mx-auto px-4 max-md:px-1 md:px-40 py-10 dark:bg-[#141413]"
     >
-      {/* SEARCH BAR */}
+      {/* SEARCH BAR - STICKY */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="mb-6 flex justify-center"
+        className="sticky top-0 z-10 bg-white dark:bg-[#141413] pt-4 pb-8 mb-8 flex justify-center"
       >
         <div className="relative w-full md:w-1/2">
           <Search
@@ -106,82 +106,77 @@ export default function BlogList({ entries }: { entries: any[] }) {
         </div>
       </motion.div>
 
-      {/* VIRTUALIZED LIST */}
-      <div
-        className="virtuoso-scroll-wrapper no-scrollbar"
-        style={{ height: "75vh" }}
-      >
-        {loading ? (
-          <div className="space-y-8">
-            {[...Array(filteredEntries.length)].map((_, i) => (
-              <BlogSkeleton key={i} />
-            ))}
-          </div>
-        ) : filteredEntries.length > 0 ? (
-          <Virtuoso
-            className="no-scrollbar"
-            data={filteredEntries}
-            initialTopMostItemIndex={initialScrollIndex}
-            overscan={200}
-            itemContent={(index, entry) => (
-              <motion.div
-                key={entry._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
+      {/* VIRTUALIZED LIST WITH WINDOW SCROLL */}
+      {loading ? (
+        <div className="space-y-8">
+          {[...Array(filteredEntries.length)].map((_, i) => (
+            <BlogSkeleton key={i} />
+          ))}
+        </div>
+      ) : filteredEntries.length > 0 ? (
+        <Virtuoso
+          useWindowScroll
+          data={filteredEntries}
+          initialTopMostItemIndex={initialScrollIndex}
+          overscan={200}
+          itemContent={(index, entry) => (
+            <motion.div
+              key={entry._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Link
+                href={`/${entry.slug}`}
+                onClick={() => handleBlogClick(index)}
+                className="flex flex-col md:flex-row items-start justify-between py-8 gap-4 md:gap-8 rounded-xl"
               >
-                <Link
-                  href={`/${entry.slug}`}
-                  onClick={() => handleBlogClick(index)}
-                  className="flex flex-col md:flex-row items-start justify-between py-8 gap-4 md:gap-8 rounded-xl"
-                >
-                  {/* IMAGE */}
-                  {entry.featuredImage && (
-                    <div className="w-full md:w-60 shrink-0 order-1 md:order-2">
-                      <Image
-                        src={entry.featuredImage.url}
-                        alt={entry.featuredImage.title}
-                        width={320}
-                        height={200}
-                        className="rounded-lg object-cover w-full h-48 md:h-36"
-                      />
-                    </div>
-                  )}
-
-                  {/* CONTENT */}
-                  <div className="flex-1 order-2 md:order-1">
-                    <h2 className="text-xl md:text-3xl font-extrabold dark:text-white mb-2">
-                      {entry.title}
-                    </h2>
-
-                    <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base mb-4 line-clamp-2">
-                      {entry.description}
-                    </p>
-
-                    <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                      {getTimeAgo(entry.publishedDate)}
-                    </div>
+                {/* IMAGE */}
+                {entry.featuredImage && (
+                  <div className="w-full md:w-60 shrink-0 order-1 md:order-2">
+                    <Image
+                      src={entry.featuredImage.url}
+                      alt={entry.featuredImage.title}
+                      width={320}
+                      height={200}
+                      className="rounded-lg object-cover w-full h-48 md:h-36"
+                    />
                   </div>
-                </Link>
-              </motion.div>
-            )}
-          />
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center py-10"
-          >
-            <p className="text-2xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
-              😕 No blogs found
-            </p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              Try another keyword.
-            </p>
-          </motion.div>
-        )}
-      </div>
+                )}
+
+                {/* CONTENT */}
+                <div className="flex-1 order-2 md:order-1">
+                  <h2 className="text-xl md:text-3xl font-extrabold dark:text-white mb-2">
+                    {entry.title}
+                  </h2>
+
+                  <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base mb-4 line-clamp-2">
+                    {entry.description}
+                  </p>
+
+                  <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                    {getTimeAgo(entry.publishedDate)}
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          )}
+        />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center py-10"
+        >
+          <p className="text-2xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
+            😕 No blogs found
+          </p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Try another keyword.
+          </p>
+        </motion.div>
+      )}
     </div>
   );
 }
